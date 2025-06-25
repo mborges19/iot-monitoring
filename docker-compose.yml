@@ -1,0 +1,72 @@
+services:
+  zookeeper:
+    image: bitnami/zookeeper:3.8
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+
+  kafka:
+    image: bitnami/kafka:3.4
+    container_name: kafka
+    restart: on-failure
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_CFG_BROKER_ID: 1
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CFG_NUM_PARTITIONS: 3
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+    depends_on:
+      - zookeeper
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui
+    container_name: kafka-ui
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: "iot_monitoring"
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:9092"
+      KAFKA_CLUSTERS_0_ZOOKEEPER: "zookeeper:2181"
+    depends_on:
+      - kafka
+      - zookeeper
+
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+  producer:
+    container_name: producer
+    build:
+      context: .
+      dockerfile: producer/Dockerfile
+    depends_on:
+      - kafka
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  consumer:
+    container_name: consumer
+    build:
+      context: .
+      dockerfile: consumer/Dockerfile
+    depends_on:
+      - kafka
+      - postgres
+    environment:
+      - PYTHONUNBUFFERED=1

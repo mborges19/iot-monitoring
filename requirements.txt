@@ -1,0 +1,5 @@
+faker==25.2.0
+pytest==8.2.2
+sqlalchemy==2.0.30
+kafka-python==2.0.2
+psycopg2-binary==2.9.9
