@@ -9,3 +9,4 @@ htmlcov/
 .coverage
 
 postgres-data/*
+!postgres-data/.gitkeep
