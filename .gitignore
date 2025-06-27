@@ -8,5 +8,4 @@ htmlcov/
 
 .coverage
 
-postgres-data/*
-!postgres-data/.gitkeep
+data_postgres/
