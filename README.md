@@ -38,7 +38,7 @@ Este projeto é uma solução de monitoramento de sensores IoT utilizando Kafka,
 
 1. **Clone o repositório**
    ```sh
-   git clone <url-do-repositorio>
+   git clone https://github.com/mborges19/iot-monitoring.git
    cd iot-monitoring
    ```
 
